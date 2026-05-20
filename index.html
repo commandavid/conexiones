@@ -99,6 +99,12 @@
             opacity: 0.9;
         }
 
+        .card.matched-category {
+            font-size: 16px !important;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
         .card.morado {
             background: #9b59b6;
             color: white;
@@ -234,6 +240,13 @@
             amarillo: ["lengua", "colada", "chimenea", "río"]
         };
 
+        const CATEGORIES_TITLES = {
+            morado: "Inventos españoles",
+            azul: "packaging cuadrado",
+            verde: "princesas de hora de aventuras",
+            amarillo: "elementos en un volcán"
+        };
+
         const CATEGORY_COLORS = {
             morado: "#9b59b6",
             azul: "#3498db",
@@ -247,9 +260,10 @@
         // Estado del juego
         let words = [];
         let selected = new Set();
-        let matchedCategories = new Set();
+        let matchedCategories = new Map();  // category name -> row index
         let matchedWords = new Set();
         let tries = TRIES_INIT;
+        let nextMatchedRow = 0;  // Next row to place a matched category
 
         // Elementos DOM
         const gridEl = document.getElementById("grid");
@@ -276,31 +290,43 @@
 
         function renderGrid() {
             gridEl.innerHTML = "";
-            words.forEach((word, idx) => {
+            const cells = [];
+
+            // Primero, agregar las categorías acertadas (en orden)
+            const sortedMatched = Array.from(matchedCategories.entries())
+                .sort((a, b) => a[1] - b[1]);  // Ordenar por número de fila
+
+            for (const [catName] of sortedMatched) {
+                for (let i = 0; i < 4; i++) {
+                    const card = document.createElement("div");
+                    card.className = `card ${catName} disabled matched-category`;
+                    card.textContent = CATEGORIES_TITLES[catName];
+                    gridEl.appendChild(card);
+                }
+            }
+
+            // Luego, agregar las palabras sin acertar (en el orden actual)
+            const unmatchedIndices = [];
+            for (let idx = 0; idx < words.length; idx++) {
+                if (!matchedWords.has(idx)) {
+                    unmatchedIndices.push(idx);
+                }
+            }
+
+            for (const idx of unmatchedIndices) {
+                const word = words[idx];
                 const card = document.createElement("div");
                 card.className = "card";
                 card.textContent = word;
                 card.dataset.idx = idx;
 
-                if (matchedWords.has(idx)) {
-                    // Encontrar la categoría de esta palabra
-                    for (const [catName, catWords] of Object.entries(CATEGORIES)) {
-                        if (catWords.includes(word)) {
-                            card.classList.add(catName);
-                            card.classList.add("disabled");
-                            break;
-                        }
-                    }
-                } else if (selected.has(idx)) {
+                if (selected.has(idx)) {
                     card.classList.add("selected");
                 }
 
-                if (!matchedWords.has(idx)) {
-                    card.addEventListener("click", () => toggleCard(idx));
-                }
-
+                card.addEventListener("click", () => toggleCard(idx));
                 gridEl.appendChild(card);
-            });
+            }
         }
 
         function toggleCard(idx) {
@@ -341,7 +367,8 @@
             if (foundCategory) {
                 // Correcto
                 selected.forEach(idx => matchedWords.add(idx));
-                matchedCategories.add(foundCategory);
+                matchedCategories.set(foundCategory, nextMatchedRow);
+                nextMatchedRow++;
                 selected.clear();
                 showMessage(`¡Correcto! Has encontrado la categoría '${foundCategory}'.`, "success");
 
@@ -371,6 +398,7 @@
             matchedCategories.clear();
             matchedWords.clear();
             tries = TRIES_INIT;
+            nextMatchedRow = 0;
             triesEl.textContent = tries;
             acceptBtn.disabled = false;
             messageEl.textContent = "";
