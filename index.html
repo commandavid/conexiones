@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexiones - Juego</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .info-bar span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        .card:hover:not(.disabled) {
+            border-color: #999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.selected {
+            background: #d3d3d3;
+            border-color: #999;
+        }
+
+        .card.disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
+        .card.morado {
+            background: #9b59b6;
+            color: white;
+            border-color: #9b59b6;
+        }
+
+        .card.azul {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .card.verde {
+            background: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+        }
+
+        .card.amarillo {
+            background: #f1c40f;
+            color: #333;
+            border-color: #f1c40f;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-accept {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-accept:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-accept:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-reset:hover {
+            background: #f5f5f5;
+        }
+
+        .message {
+            text-align: center;
+            min-height: 24px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .message.success {
+            color: #2ecc71;
+        }
+
+        .message.error {
+            color: #e74c3c;
+        }
+
+        .message.info {
+            color: #667eea;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .grid {
+                gap: 6px;
+            }
+
+            .card {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conexiones</h1>
+        <p class="subtitle">Encuentra las 4 categorías conectadas</p>
+
+        <div class="info-bar">
+            <span>Intentos: <span id="tries">4</span></span>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="controls">
+            <button class="btn-accept" id="acceptBtn">Aceptar</button>
+            <button class="btn-reset" id="resetBtn">Reiniciar</button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // Datos del juego
+        const CATEGORIES = {
+            morado: ["chupa chups", "fregona", "futbolín", "sopa de letras"],
+            azul: ["sugus", "pizza", "vinilo", "empanada"],
+            verde: ["chicle", "llama", "bultos", "desayuno"],
+            amarillo: ["lengua", "colada", "chimenea", "río"]
+        };
+
+        const CATEGORY_COLORS = {
+            morado: "#9b59b6",
+            azul: "#3498db",
+            verde: "#2ecc71",
+            amarillo: "#f1c40f"
+        };
+
+        const TABLE_SIZE = 4;
+        const TRIES_INIT = 4;
+
+        // Estado del juego
+        let words = [];
+        let selected = new Set();
+        let matchedCategories = new Set();
+        let matchedWords = new Set();
+        let tries = TRIES_INIT;
+
+        // Elementos DOM
+        const gridEl = document.getElementById("grid");
+        const triesEl = document.getElementById("tries");
+        const acceptBtn = document.getElementById("acceptBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const messageEl = document.getElementById("message");
+
+        // Funciones
+        function generateWords() {
+            const allWords = [
+                ...CATEGORIES.morado,
+                ...CATEGORIES.azul,
+                ...CATEGORIES.verde,
+                ...CATEGORIES.amarillo
+            ];
+            // Mezclar
+            for (let i = allWords.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allWords[i], allWords[j]] = [allWords[j], allWords[i]];
+            }
+            return allWords;
+        }
+
+        function renderGrid() {
+            gridEl.innerHTML = "";
+            words.forEach((word, idx) => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.textContent = word;
+                card.dataset.idx = idx;
+
+                if (matchedWords.has(idx)) {
+                    // Encontrar la categoría de esta palabra
+                    for (const [catName, catWords] of Object.entries(CATEGORIES)) {
+                        if (catWords.includes(word)) {
+                            card.classList.add(catName);
+                            card.classList.add("disabled");
+                            break;
+                        }
+                    }
+                } else if (selected.has(idx)) {
+                    card.classList.add("selected");
+                }
+
+                if (!matchedWords.has(idx)) {
+                    card.addEventListener("click", () => toggleCard(idx));
+                }
+
+                gridEl.appendChild(card);
+            });
+        }
+
+        function toggleCard(idx) {
+            if (selected.has(idx)) {
+                selected.delete(idx);
+            } else {
+                if (selected.size >= 4) {
+                    showMessage("Solo puedes seleccionar hasta 4 tarjetas antes de aceptar.", "error");
+                    return;
+                }
+                selected.add(idx);
+            }
+            renderGrid();
+        }
+
+        function checkAnswer() {
+            if (selected.size !== 4) {
+                showMessage("Debes seleccionar exactamente 4 tarjetas antes de aceptar.", "error");
+                return;
+            }
+
+            const selectedWords = new Set([...selected].map(idx => words[idx]));
+            let foundCategory = null;
+
+            for (const [catName, catWords] of Object.entries(CATEGORIES)) {
+                if (!matchedCategories.has(catName)) {
+                    const catSet = new Set(catWords);
+                    if (
+                        selectedWords.size === catSet.size &&
+                        [...selectedWords].every(w => catSet.has(w))
+                    ) {
+                        foundCategory = catName;
+                        break;
+                    }
+                }
+            }
+
+            if (foundCategory) {
+                // Correcto
+                selected.forEach(idx => matchedWords.add(idx));
+                matchedCategories.add(foundCategory);
+                selected.clear();
+                showMessage(`¡Correcto! Has encontrado la categoría '${foundCategory}'.`, "success");
+
+                if (matchedCategories.size === Object.keys(CATEGORIES).length) {
+                    showMessage("¡Has acertado todas las categorías! 🎉 ¡Ganaste!", "success");
+                    acceptBtn.disabled = true;
+                }
+            } else {
+                // Incorrecto
+                selected.clear();
+                tries--;
+                triesEl.textContent = tries;
+                showMessage("No era una solución válida. Has perdido 1 intento.", "error");
+
+                if (tries <= 0) {
+                    showMessage("Se han agotado los intentos. Fin del juego.", "error");
+                    acceptBtn.disabled = true;
+                }
+            }
+
+            renderGrid();
+        }
+
+        function resetGame() {
+            words = generateWords();
+            selected.clear();
+            matchedCategories.clear();
+            matchedWords.clear();
+            tries = TRIES_INIT;
+            triesEl.textContent = tries;
+            acceptBtn.disabled = false;
+            messageEl.textContent = "";
+            messageEl.className = "message";
+            renderGrid();
+        }
+
+        function showMessage(text, type = "info") {
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+        }
+
+        // Event listeners
+        acceptBtn.addEventListener("click", checkAnswer);
+        resetBtn.addEventListener("click", resetGame);
+
+        // Inicializar
+        resetGame();
+    </script>
+</body>
+</html>
+
