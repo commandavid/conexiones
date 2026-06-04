@@ -67,7 +67,24 @@ const PUZZLES = [
             verde: "Números de títulos de películas",
             amarillo: "Funny number"
         }
-    }
+    },
+
+         {
+             date: "2026-06-04",
+             label: "Ñam",
+             categories: {
+                 morado: ["Avellana", "Moratón️", "Vacante", "Totopo"],
+                 azul: ["Azúcar", "Especias", "Todo lo bueno", "X"],
+                 verde: ["Leche", "Hostia", "Piña", "Castaña"],
+                 amarillo: ["Cacao", "Lío", "Movida", "Jaleo"]
+             },
+             titles: {
+                 morado: "Contiene un animal en el nombre",
+                 azul: "Ingredientes de las Supernenas",
+                 verde: "Golpe",
+                 amarillo: "😵‍💫😵‍💫😵‍💫"
+             }
+         }
 ];
 
 
