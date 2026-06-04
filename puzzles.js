@@ -36,7 +36,7 @@ const PUZZLES = [
     },
 
     {
-        date: "2026-06-04",
+        date: "2026-06-02",
         label: "No hay dos sin tres",
         categories: {
             morado: ["bajo", "punto", "posición", "corriente"],
@@ -51,6 +51,23 @@ const PUZZLES = [
             amarillo: "Pez"
         }
     }
+
+    {
+            date: "2026-06-03",
+            label: "Matemático!",
+            categories: {
+                morado: ["1", "✖️", "2", "⚽️"],
+                azul: ["4", "➕", "25", "➗"],
+                verde: ["451", "300", "7", "11"],
+                amarillo: ["67", "69", "420", "21"]
+            },
+            titles: {
+                morado: "Quiniela",
+                azul: "Discos más vendidos de los 2000s",
+                verde: "Números de títulos de películas",
+                amarillo: "Funny number"
+            }
+        }
 ];
 
 
