@@ -50,7 +50,7 @@ const PUZZLES = [
             verde: "Monedas",
             amarillo: "Pez"
         }
-    }
+    },
 
     {
             date: "2026-06-03",
