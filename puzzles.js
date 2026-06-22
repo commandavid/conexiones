@@ -101,6 +101,23 @@ const PUZZLES = [
                  verde: "Se acaba la verbena",
                  amarillo: "Plurales de los 2000s"
              }
+         },
+
+         {
+             date: "2026-06-06",
+             label: "Fium",
+             categories: {
+                 morado: ["Piloto", "Medias", "Gotas en un cristal", "Universitario"],
+                 azul: ["Coche", "Pie", "Andén", "Curva"],
+                 verde: ["Agujero", "Talón", "Punta", "Caña"],
+                 amarillo: ["Taco", "Flecha", "Jabalina", "Batuta"]
+             },
+             titles: {
+                 morado: "Hacen carreras",
+                 azul: "Atención, estación en curva. Al salir, tenga cuidado con no introducir el pie entre coche y andén",
+                 verde: "Partes de un calcetín",
+                 amarillo: "Palos"
+             }
          }
 ];
 
