@@ -118,6 +118,23 @@ const PUZZLES = [
             verde: "Partes de un calcetín",
             amarillo: "Palos"
         }
+    },
+
+    {
+        date: "2026-06-07",
+        label: "😏",
+        categories: {
+            morado: ["Sala", "Temor", "Vea", "Frene"],
+            azul: ["Once", "Profesor", "De la línea", "Noticia"],
+            verde: ["Cinco", "Trece", "Abogado", "Ocho"],
+            amarillo: ["Americano", "Largo", "Solo", "Azteca"]
+        },
+        titles: {
+            morado: "Anagramas de empresas de transporte",
+            azul: "Titular",
+            verde: "Rimas",
+            amarillo: "Preparaciones del café"
+        }
     }
 ];
 
