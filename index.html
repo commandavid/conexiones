@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexiones - Juego</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Conexiones</h1>
+        <p class="subtitle">Encuentra las 4 categorías conectadas</p>
+
+        <div class="info-bar">
+            <div class="stat-group">
+                <div class="stat-item">
+                    <span class="stat-label">Intentos:</span>
+                    <span class="stat-value" id="tries">4</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Reinicios:</span>
+                    <span class="stat-value" id="resets">0</span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-icon" id="leaderboardBtn" title="Leaderboard">🏆</button>
+                <button class="btn-icon" id="puzzleBtn" title="Otros días">📅</button>
+            </div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="controls">
+            <button class="btn-accept" id="acceptBtn">Aceptar</button>
+            <button class="btn-reset" id="resetBtn">Reiniciar</button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Tu configuración de Firebase - REEMPLAZA CON TUS DATOS
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFGP1gUwUyx1zhkPOQeKxoxwgmYRqv2V0",
+            authDomain: "conexiones-game.firebaseapp.com",
+            projectId: "conexiones-game",
+            storageBucket: "conexiones-game.firebasestorage.app",
+            messagingSenderId: "491600988468",
+            appId: "1:491600988468:web:7e78362b94f5ff3e0a7d61",
+            //measurementId: "G-9QV8JZWYNK"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        db.settings({ timestampsInSnapshots: true });
+
+    </script>
+
+    <!-- Puzzle data -->
+    <script src="data/puzzles.js"></script>
+
+    <!-- App scripts -->
+    <script src="js/state.js"></script>
+    <script src="js/puzzle-loader.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

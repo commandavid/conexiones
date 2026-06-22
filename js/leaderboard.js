@@ -1,0 +1,83 @@
+// ==========================================================================
+// leaderboard.js
+// Firebase leaderboard functionality
+// ==========================================================================
+
+// --- Leaderboard state ---
+let isShowingLeaderboard = false;
+
+// --- Leaderboard key ---
+// Each puzzle has its OWN leaderboard, keyed by the puzzle's date (or a
+// stable per-index fallback). Because puzzles are daily, this also gives a
+// fresh board each day.
+function getLeaderboardKey() {
+  return getPuzzleKey(currentPuzzleIndex);
+}
+
+// --- Save score after winning ---
+async function saveScore(name, fails, resets) {
+  const dayKey = getLeaderboardKey();
+  
+  try {
+    await db.collection('leaderboards')
+      .doc(dayKey)
+      .collection('scores')
+      .add({
+        name: name.toUpperCase().slice(0, 5),
+        fails: fails,
+        resets: resets,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    return true;
+  } catch (error) {
+    console.error('Error saving score:', error);
+    return false;
+  }
+}
+
+// --- Load leaderboard for current puzzle ---
+async function loadLeaderboard() {
+  const dayKey = getLeaderboardKey();
+  
+  try {
+    const snapshot = await db.collection('leaderboards')
+      .doc(dayKey)
+      .collection('scores')
+      .orderBy('fails', 'asc')
+      .limit(50)
+      .get();
+    
+    const scores = [];
+    snapshot.forEach(doc => {
+      scores.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    // Mejor = menos fallos, luego menos reinicios
+    scores.sort((a, b) => {
+      const failsA = Number(a.fails) || 0;
+      const failsB = Number(b.fails) || 0;
+      if (failsA !== failsB) return failsA - failsB;
+      return (Number(a.resets) || 0) - (Number(b.resets) || 0);
+    });
+    return scores.slice(0, 10);
+  } catch (error) {
+    console.error('Error loading leaderboard:', error);
+    return [];
+  }
+}
+
+// --- Leaderboard view ---
+// showLeaderboard / hideLeaderboard are defined in main.js (loaded last) and
+// render the table via renderLeaderboard() in render.js.
+
+// --- Score submission dialog ---
+// The dialog UI lives in render.js (showScoreSubmission / closeScoreDialog)
+// and the submit/skip handlers in main.js. Both are loaded after this file,
+// so they are the single source of truth.
+
+// --- Reset counter ---
+// Solo se incrementa cuando el jugador pulsa el botón "Reiniciar"
+// (ver el listener en main.js). Se pone a 0 al cargar un puzzle.
+let resetCount = 0;
