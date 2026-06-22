@@ -58,6 +58,50 @@ h1 {
     color: #333;
 }
 
+.info-bar .stat-group {
+    display: flex;
+    gap: 16px;
+}
+
+.info-bar .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.info-bar .stat-label {
+    font-weight: 400;
+    color: #666;
+    font-size: 13px;
+}
+
+.info-bar .stat-value {
+    font-weight: 700;
+    color: #333;
+    min-width: 20px;
+}
+
+.info-bar .btn-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.info-bar .btn-icon {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.info-bar .btn-icon:hover {
+    background: #f0f0f0;
+    transform: scale(1.05);
+}
+
 /* --- Puzzle grid ---------------------------------------------------------- */
 .grid {
     display: grid;
@@ -257,14 +301,258 @@ button {
     color: #667eea;
 }
 
-/* --- Responsive ------------------------------------------------------------ */
+/* --- Leaderboard styles ---------------------------------------------------- */
+.leaderboard-list {
+    grid-template-columns: 1fr !important;
+}
+
+.leaderboard-header {
+    text-align: center;
+    padding: 16px 0;
+    grid-column: 1 / -1;
+}
+
+.leaderboard-header h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.leaderboard-subtitle {
+    color: #999;
+    font-size: 14px;
+}
+
+.leaderboard-table {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 40px 60px 80px 1fr;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.leaderboard-row.first {
+    background: linear-gradient(135deg, #ffd700, #ffed4a);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.rank {
+    font-weight: 700;
+    color: #666;
+}
+
+.leaderboard-row.first .rank {
+    color: #8B7500;
+}
+
+.name {
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+}
+
+.score {
+    font-weight: 700;
+    color: #667eea;
+}
+
+.leaderboard-row.first .score {
+    color: #8B7500;
+}
+
+.details {
+    font-size: 12px;
+    color: #999;
+    justify-self: end;
+}
+
+.empty-leaderboard {
+    text-align: center;
+    padding: 32px;
+    color: #999;
+    font-style: italic;
+    grid-column: 1 / -1;
+}
+
+.leaderboard-controls {
+    grid-column: 1 / -1;
+    margin-top: 16px;
+}
+
+.btn-leaderboard-close {
+    width: 100%;
+    padding: 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-leaderboard-close:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* --- Score submission overlay --- */
+.score-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.score-dialog {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.score-dialog h2 {
+    margin-bottom: 8px;
+    font-size: 28px;
+}
+
+.score-dialog p {
+    margin: 8px 0;
+    color: #666;
+}
+
+.score-dialog .score-value {
+    font-size: 20px;
+    margin: 12px 0;
+}
+
+.score-dialog .score-value strong {
+    color: #667eea;
+    font-size: 28px;
+}
+
+.score-dialog label {
+    display: block;
+    margin: 20px 0 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.score-dialog input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 32px;
+    text-align: center;
+    letter-spacing: 12px;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    transition: border-color 0.2s ease;
+}
+
+.score-dialog input:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.score-dialog input::placeholder {
+    letter-spacing: 4px;
+    font-size: 20px;
+    color: #ccc;
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.dialog-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-save {
+    background: #667eea;
+    color: white;
+}
+
+.btn-save:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-skip {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.btn-skip:hover {
+    background: #e0e0e0;
+}
+
+/* --- Responsive --- */
 @media (max-width: 600px) {
     .container {
-        padding: 20px;
+        padding: 16px;
     }
 
     h1 {
         font-size: 24px;
+    }
+
+    .subtitle {
+        font-size: 12px;
+        margin-bottom: 16px;
     }
 
     .grid {
@@ -273,5 +561,97 @@ button {
 
     .card {
         font-size: 11px;
+        padding: 6px;
+    }
+
+    .merged-category .title {
+        font-size: 14px;
+    }
+    
+    .merged-category .words {
+        font-size: 10px;
+    }
+
+    .info-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .info-bar .stat-group {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .info-bar .btn-group {
+        margin-left: auto;
+    }
+
+    .leaderboard-row {
+        grid-template-columns: 30px 50px 60px 1fr;
+        padding: 10px 12px;
+        font-size: 13px;
+        gap: 8px;
+    }
+
+    .name {
+        font-size: 16px;
+    }
+
+    .score-dialog {
+        padding: 24px;
+        margin: 16px;
+    }
+
+    .score-dialog input {
+        font-size: 24px;
+        letter-spacing: 8px;
+        padding: 10px;
+    }
+
+    .dialog-buttons {
+        flex-direction: column;
+    }
+
+    .puzzle-list {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .card {
+        font-size: 9px;
+        padding: 4px;
+    }
+
+    .merged-category .title {
+        font-size: 12px;
+    }
+    
+    .merged-category .words {
+        font-size: 9px;
+    }
+
+    .info-bar .stat-group {
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .info-bar .btn-icon {
+        padding: 4px 8px;
+        font-size: 14px;
+    }
+
+    .leaderboard-row {
+        grid-template-columns: 25px 40px 50px 1fr;
+        padding: 8px 10px;
+        font-size: 12px;
+        gap: 6px;
+    }
+
+    .name {
+        font-size: 14px;
+        letter-spacing: 1px;
     }
 }

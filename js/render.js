@@ -111,6 +111,9 @@ function showPuzzleList() {
     } catch (e) {}
     const controlsEl = document.querySelector('.controls');
     if (controlsEl) controlsEl.style.display = 'none';
+    // Ocultar botón de leaderboard también
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    if (leaderboardBtn) leaderboardBtn.style.display = 'none';
 }
 
 function hidePuzzleList() {
@@ -125,4 +128,70 @@ function hidePuzzleList() {
     } catch (e) {}
     const controlsEl = document.querySelector('.controls');
     if (controlsEl) controlsEl.style.display = '';
+    // Restaurar botón de leaderboard
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    if (leaderboardBtn) leaderboardBtn.style.display = '';
+}
+
+// --- Leaderboard rendering functions ---
+
+function renderLeaderboard(scores) {
+    gridEl.classList.add('leaderboard-list');
+    gridEl.innerHTML = `
+        <div class="leaderboard-header">
+            <h2>MEJORES PUNTUACIONES</h2>
+            <p class="leaderboard-subtitle">${PUZZLES[currentPuzzleIndex]?.date || 'Puzzle'}</p>
+        </div>
+        <div class="leaderboard-table">
+            ${scores.length === 0 ? '<div class="empty-leaderboard">Aún no hay puntuaciones. ¡Sé el primero!</div>' : ''}
+            ${scores.map((score, index) => `
+                <div class="leaderboard-row ${index === 0 ? 'first' : ''}">
+                    <span class="rank">#${index + 1}</span>
+                    <span class="name">${score.name || '???'}</span>
+                    <span class="score">${score.score || 0} pts</span>
+                    <span class="details">${score.attempts !== undefined ? TRIES_INIT - score.attempts : 0} fallos · ${score.resets || 0} reinicios</span>
+                </div>
+            `).join('')}
+        </div>
+        <div class="leaderboard-controls">
+            <button class="btn-leaderboard-close" onclick="hideLeaderboard()">Volver al juego</button>
+        </div>
+    `;
+}
+
+function showScoreSubmission(attempts, resets, score) {
+    // Remover overlay existente si hay
+    closeScoreDialog();
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'score-overlay';
+    overlay.id = 'scoreOverlay';
+    overlay.innerHTML = `
+        <div class="score-dialog">
+            <h2>¡Puzzle completado!</h2>
+            <p>Fallos: ${TRIES_INIT - attempts} | Reinicios: ${resets}</p>
+            <p class="score-value">Puntuación: <strong>${score}</strong> pts</p>
+            <label for="playerName">Introduce tus iniciales (3 letras):</label>
+            <input type="text" id="playerName" maxlength="3" placeholder="ABC" autofocus>
+            <div class="dialog-buttons">
+                <button class="btn-save" onclick="submitScore()">Guardar puntuación</button>
+                <button class="btn-skip" onclick="closeScoreDialog()">Omitir</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const input = document.getElementById('playerName');
+    input.focus();
+    input.select();
+    
+    // Enter key to submit
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitScore();
+    });
+}
+
+function closeScoreDialog() {
+    const overlay = document.getElementById('scoreOverlay');
+    if (overlay) overlay.remove();
 }
