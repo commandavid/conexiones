@@ -84,6 +84,23 @@ const PUZZLES = [
                  verde: "Golpe",
                  amarillo: "😵‍💫😵‍💫😵‍💫"
              }
+         },
+
+         {
+             date: "2026-06-05",
+             label: "Temones",
+             categories: {
+                 morado: ["Por la raja de tu falda", "Superestrella", "Y nos dieron las Diez", "La madre de José"],
+                 azul: ["Jardín con enanitos", "Blanco y negro", "Oye mi amor", "Hijo de la luna"],
+                 verde: ["Legalización", "Vamos a la cama", "Fiesta pagana", "Sebas, Guille y los demás"],
+                 amarillo: ["Princesas", "Rosas", "Zapatillas", "Besos"]
+             },
+             titles: {
+                 morado: "Narraciones en primera persona de flechazos a primera vista",
+                 azul: "Artistas que empiezan con 'M'",
+                 verde: "Se acaba la verbena",
+                 amarillo: "Plurales de los 2000s"
+             }
          }
 ];
 
