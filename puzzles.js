@@ -69,56 +69,56 @@ const PUZZLES = [
         }
     },
 
-         {
-             date: "2026-06-04",
-             label: "Ñam",
-             categories: {
-                 morado: ["Avellana", "Moratón️", "Vacante", "Totopo"],
-                 azul: ["Azúcar", "Especias", "Todo lo bueno", "X"],
-                 verde: ["Leche", "Hostia", "Piña", "Castaña"],
-                 amarillo: ["Cacao", "Lío", "Movida", "Jaleo"]
-             },
-             titles: {
-                 morado: "Contiene un animal en el nombre",
-                 azul: "Ingredientes de las Supernenas",
-                 verde: "Golpe",
-                 amarillo: "😵‍💫😵‍💫😵‍💫"
-             }
-         },
+    {
+        date: "2026-06-04",
+        label: "Ñam",
+        categories: {
+            morado: ["Avellana", "Moratón️", "Vacante", "Totopo"],
+            azul: ["Azúcar", "Especias", "Todo lo bueno", "X"],
+            verde: ["Leche", "Hostia", "Piña", "Castaña"],
+            amarillo: ["Cacao", "Lío", "Movida", "Jaleo"]
+        },
+        titles: {
+            morado: "Contiene un animal en el nombre",
+            azul: "Ingredientes de las Supernenas",
+            verde: "Golpe",
+            amarillo: "😵‍💫😵‍💫😵‍💫"
+        }
+    },
 
-         {
-             date: "2026-06-05",
-             label: "Temones",
-             categories: {
-                 morado: ["Por la raja de tu falda", "Superestrella", "Y nos dieron las Diez", "La madre de José"],
-                 azul: ["Jardín con enanitos", "Blanco y negro", "Oye mi amor", "Hijo de la luna"],
-                 verde: ["Legalización", "Vamos a la cama", "Fiesta pagana", "Sebas, Guille y los demás"],
-                 amarillo: ["Princesas", "Rosas", "Zapatillas", "Besos"]
-             },
-             titles: {
-                 morado: "Narraciones en primera persona de flechazos a primera vista",
-                 azul: "Artistas que empiezan con 'M'",
-                 verde: "Se acaba la verbena",
-                 amarillo: "Plurales de los 2000s"
-             }
-         },
+    {
+        date: "2026-06-05",
+        label: "Temones",
+        categories: {
+            morado: ["Por la raja de tu falda", "Superestrella", "Y nos dieron las Diez", "La madre de José"],
+            azul: ["Jardín con enanitos", "Blanco y negro", "Oye mi amor", "Hijo de la luna"],
+            verde: ["Legalización", "Vamos a la cama", "Fiesta pagana", "Sebas, Guille y los demás"],
+            amarillo: ["Princesas", "Rosas", "Zapatillas", "Besos"]
+        },
+        titles: {
+            morado: "Narraciones en primera persona de flechazos a primera vista",
+            azul: "Artistas que empiezan con 'M'",
+            verde: "Se acaba la verbena",
+            amarillo: "Plurales de los 2000s"
+        }
+    },
 
-         {
-             date: "2026-06-06",
-             label: "Fium",
-             categories: {
-                 morado: ["Piloto", "Medias", "Gotas en un cristal", "Universitario"],
-                 azul: ["Coche", "Pie", "Andén", "Curva"],
-                 verde: ["Agujero", "Talón", "Punta", "Caña"],
-                 amarillo: ["Taco", "Flecha", "Jabalina", "Batuta"]
-             },
-             titles: {
-                 morado: "Hacen carreras",
-                 azul: "Atención, estación en curva. Al salir, tenga cuidado con no introducir el pie entre coche y andén",
-                 verde: "Partes de un calcetín",
-                 amarillo: "Palos"
-             }
-         }
+    {
+        date: "2026-06-06",
+        label: "Corre corre corre",
+        categories: {
+            morado: ["Piloto", "Medias", "Gotas en un cristal", "Universitario"],
+            azul: ["Coche", "Pie", "Andén", "Curva"],
+            verde: ["Agujero", "Talón", "Punta", "Caña"],
+            amarillo: ["Taco", "Flecha", "Jabalina", "Batuta"]
+        },
+        titles: {
+            morado: "Hacen carreras",
+            azul: "Atención, estación en curva. Al salir, tenga cuidado con no introducir el pie entre coche y andén",
+            verde: "Partes de un calcetín",
+            amarillo: "Palos"
+        }
+    }
 ];
 
 
