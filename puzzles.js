@@ -31,7 +31,7 @@ const PUZZLES = [
             morado: "Herramientas",
             azul: "Asociados con la sabiduría",
             verde: "Looney Toons",
-            amarillo: "Mamíferos marinos"
+            amarillo: "Mamíferos acuáticos"
         }
     },
 
