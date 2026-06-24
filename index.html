@@ -5,10 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conexiones - Juego</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script>
+        // Apply the saved (or system) appearance before first paint to avoid
+        // a flash of the wrong theme.
+        (function () {
+            try {
+                var allowed = ['clasico', 'minimalista', 'oceano', 'atardecer', 'bosque', 'uva'];
+                var t = localStorage.getItem('conexiones-theme');
+                if (allowed.indexOf(t) === -1) t = 'clasico';
+                var m = localStorage.getItem('conexiones-mode');
+                if (m !== 'dark' && m !== 'light') {
+                    m = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-theme', t);
+                document.documentElement.setAttribute('data-mode', m);
+            } catch (e) {}
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Conexiones</h1>
+        <div class="app-header">
+            <button class="appearance-btn" id="themeBtn" title="Temas" aria-label="Cambiar tema">🎨</button>
+            <h1>Conexiones</h1>
+            <label class="mode-toggle" title="Modo claro / oscuro">
+                <input type="checkbox" id="modeToggle" aria-label="Activar modo oscuro">
+                <span class="mode-slider"></span>
+            </label>
+            <div class="theme-menu" id="themeMenu" hidden></div>
+        </div>
         <p class="subtitle">Encuentra las 4 categorías conectadas</p>
 
         <div class="info-bar">
@@ -23,6 +48,8 @@
                 </div>
             </div>
             <div class="btn-group">
+                <button class="btn-icon" id="subscribeBtn" title="Avísame de nuevos puzzles">⭐</button>
+                <button class="btn-icon" id="rulesBtn" title="Cómo jugar">❓</button>
                 <button class="btn-icon" id="leaderboardBtn" title="Leaderboard">🏆</button>
                 <button class="btn-icon" id="puzzleBtn" title="Otros días">📅</button>
             </div>
@@ -70,6 +97,8 @@
     <script src="js/render.js"></script>
     <script src="js/game.js"></script>
     <script src="js/leaderboard.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/subscribe.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

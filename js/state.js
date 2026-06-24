@@ -34,6 +34,8 @@ let tries = TRIES_INIT;
 let totalFails = 0;  // Fallos acumulados de todos los reinicios del puzzle actual
 let nextMatchedRow = 0;  // Next row to place a matched category
 let messageTimeout = null;
+let dragSourceIdx = null;  // words-index of the card currently being dragged
+let didDrag = false;       // guards against the click that may follow a drag
 
 // --- DOM element references ----------------------------------------------------
 const gridEl = document.getElementById("grid");

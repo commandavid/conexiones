@@ -40,48 +40,140 @@ function renderGrid() {
         card.className = "card";
         card.textContent = word;
         card.dataset.idx = idx;
+        card.draggable = true;
 
         if (selected.has(idx)) {
             card.classList.add("selected");
         }
 
-        card.addEventListener("click", () => toggleCard(idx));
+        card.addEventListener("click", () => {
+            // Ignore the click that browsers may dispatch right after a drag
+            if (didDrag) {
+                didDrag = false;
+                return;
+            }
+            toggleCard(idx);
+        });
+
+        attachDragHandlers(card, idx);
         gridEl.appendChild(card);
     }
 }
 
+// --- Drag & drop reordering of unmatched cards ----------------------------
+
+function attachDragHandlers(card, idx) {
+    card.addEventListener('dragstart', (e) => {
+        dragSourceIdx = idx;
+        didDrag = true;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) {}
+    });
+
+    card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        dragSourceIdx = null;
+        document.querySelectorAll('.card.drag-over')
+            .forEach(c => c.classList.remove('drag-over'));
+    });
+
+    card.addEventListener('dragover', (e) => {
+        if (dragSourceIdx === null) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (idx !== dragSourceIdx) card.classList.add('drag-over');
+    });
+
+    card.addEventListener('dragleave', () => {
+        card.classList.remove('drag-over');
+    });
+
+    card.addEventListener('drop', (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+        const dragIdx = dragSourceIdx;
+        if (dragIdx === null || dragIdx === idx) return;
+        swapCards(dragIdx, idx);
+    });
+}
+
+// Swap the two affected cards (words-indices `aIdx` and `bIdx`) in place.
+// Only these two positions change; every other card stays where it is.
+// Selection follows each word to its new slot.
+function swapCards(aIdx, bIdx) {
+    if (aIdx === bIdx) return;
+
+    const newWords = words.slice();
+    [newWords[aIdx], newWords[bIdx]] = [newWords[bIdx], newWords[aIdx]];
+    words = newWords;
+
+    const aSelected = selected.has(aIdx);
+    const bSelected = selected.has(bIdx);
+    if (bSelected) selected.add(aIdx); else selected.delete(aIdx);
+    if (aSelected) selected.add(bIdx); else selected.delete(bIdx);
+
+    renderGrid();
+}
+
+let _puzzleListToken = 0;
+
 function renderPuzzleList() {
     gridEl.classList.add('puzzle-list');
     gridEl.innerHTML = '';
-    // Order puzzles by date desc if date present else by index desc
-    const indices = PUZZLES.map((p, i) => i).sort((a, b) => {
-        const da = PUZZLES[a].date || '';
-        const db = PUZZLES[b].date || '';
-        if (da && db) return db.localeCompare(da);
-        return b - a;
-    });
 
-    indices.forEach(i => {
+    if (typeof PUZZLES === 'undefined' || !PUZZLES.length) return;
+
+    // Chronological order (oldest first) drives the puzzle numbering: the
+    // earliest puzzle is #1 and the count goes up from there.
+    const chronological = PUZZLES.map((p, i) => i).sort((a, b) => {
+        const da = Date.parse(PUZZLES[a].date || '');
+        const db = Date.parse(PUZZLES[b].date || '');
+        const ta = Number.isNaN(da) ? 0 : da;
+        const tb = Number.isNaN(db) ? 0 : db;
+        if (ta !== tb) return ta - tb;
+        return a - b;
+    });
+    const numberByIndex = {};
+    chronological.forEach((idx, k) => { numberByIndex[idx] = k + 1; });
+
+    // The list itself is shown newest first.
+    const displayOrder = [...chronological].reverse();
+
+    // Token guards against stale async difficulty updates if the view changes
+    // (e.g. the player navigates away before the Firestore reads resolve).
+    const token = ++_puzzleListToken;
+
+    displayOrder.forEach(i => {
         const p = PUZZLES[i];
         const tile = document.createElement('div');
         tile.className = 'puzzle-tile';
-        const dateEl = document.createElement('div');
-        dateEl.className = 'date';
-        dateEl.textContent = p.date || `Puzzle ${i + 1}`;
-        const metaEl = document.createElement('div');
-        metaEl.className = 'meta';
-        // Show puzzle label (single title) instead of listing categories
-        metaEl.textContent = p.label || p.date || `Puzzle ${i + 1}`;
+
+        const num = document.createElement('span');
+        num.className = 'puzzle-num';
+        num.textContent = numberByIndex[i];
+
+        const name = document.createElement('span');
+        name.className = 'puzzle-name';
+        name.textContent = p.label || p.date || `Puzzle ${i + 1}`;
+
         const solvedKey = getPuzzleKey(i);
         if (solvedPuzzles.has(solvedKey)) {
-            const solvedEl = document.createElement('div');
-            solvedEl.className = 'solved';
-            solvedEl.textContent = '✓ resuelto';
-            tile.appendChild(solvedEl);
+            tile.classList.add('solved');
+            const check = document.createElement('span');
+            check.className = 'puzzle-solved-check';
+            check.textContent = '✓';
+            check.title = 'Resuelto';
+            name.appendChild(check);
         }
 
-        tile.appendChild(dateEl);
-        tile.appendChild(metaEl);
+        const diff = document.createElement('span');
+        diff.className = 'puzzle-diff diff-loading';
+        diff.textContent = '…';
+
+        tile.appendChild(num);
+        tile.appendChild(name);
+        tile.appendChild(diff);
 
         tile.addEventListener('click', () => {
             // If there is game progress, confirm
@@ -95,6 +187,18 @@ function renderPuzzleList() {
         });
 
         gridEl.appendChild(tile);
+
+        // Difficulty is derived from the puzzle's completion stats in Firestore.
+        if (typeof loadPuzzleDifficulty === 'function') {
+            loadPuzzleDifficulty(solvedKey).then(d => {
+                if (token !== _puzzleListToken || !diff.isConnected) return;
+                diff.textContent = d.label;
+                diff.className = `puzzle-diff diff-${d.level}`;
+            }).catch(() => {});
+        } else {
+            diff.textContent = 'Sin probar';
+            diff.className = 'puzzle-diff diff-untested';
+        }
     });
 }
 
@@ -209,5 +313,46 @@ function showScoreSubmission(fails, resets) {
 
 function closeScoreDialog() {
     const overlay = document.getElementById('scoreOverlay');
+    if (overlay) overlay.remove();
+}
+
+// --- Rules modal -----------------------------------------------------------
+// Placeholder content for now; the full rules will be filled in later.
+function showRules() {
+    closeRulesModal();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'rulesOverlay';
+
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-dialog rules-dialog';
+
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Cómo jugar';
+
+    const p = document.createElement('p');
+    p.textContent = 'Encuentra los cuatro grupos de cuatro palabras que comparten algo en común. ' +
+        'Selecciona cuatro tarjetas y pulsa «Aceptar». (Reglas detalladas próximamente.)';
+
+    const close = document.createElement('button');
+    close.className = 'btn-save';
+    close.textContent = 'Entendido';
+    close.addEventListener('click', closeRulesModal);
+
+    dialog.appendChild(h2);
+    dialog.appendChild(p);
+    dialog.appendChild(close);
+    overlay.appendChild(dialog);
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeRulesModal();
+    });
+
+    document.body.appendChild(overlay);
+}
+
+function closeRulesModal() {
+    const overlay = document.getElementById('rulesOverlay');
     if (overlay) overlay.remove();
 }

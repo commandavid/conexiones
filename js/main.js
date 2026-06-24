@@ -24,6 +24,37 @@ if (leaderboardBtn) {
     });
 }
 
+// --- Appearance (theme + light/dark) ---
+const themeBtn = document.getElementById('themeBtn');
+if (themeBtn) {
+    themeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleThemeMenu();
+    });
+}
+
+const modeToggle = document.getElementById('modeToggle');
+if (modeToggle) {
+    modeToggle.addEventListener('change', () => {
+        applyMode(modeToggle.checked ? 'dark' : 'light', true);
+    });
+}
+
+// Close the theme menu when clicking anywhere outside of it.
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('themeMenu');
+    if (!menu || menu.hidden) return;
+    if (menu.contains(e.target) || (themeBtn && themeBtn.contains(e.target))) return;
+    closeThemeMenu();
+});
+
+// Rules + subscribe buttons
+const rulesBtn = document.getElementById('rulesBtn');
+if (rulesBtn) rulesBtn.addEventListener('click', showRules);
+
+const subscribeBtn = document.getElementById('subscribeBtn');
+if (subscribeBtn) subscribeBtn.addEventListener('click', showSubscribeModal);
+
 acceptBtn.addEventListener("click", checkAnswer);
 resetBtn.addEventListener("click", () => {
     resetCount++;
@@ -32,6 +63,7 @@ resetBtn.addEventListener("click", () => {
 
 // --- Initialization ---
 
+initAppearance();
 loadSolvedFromSession();
 
 // Choose latest puzzle chronologically if puzzles are available
