@@ -20,7 +20,7 @@ const THEMES = [
     { id: 'uva',         name: 'Uva',         swatch: '#a83fc0' }
 ];
 
-const DEFAULT_THEME = 'clasico';
+const DEFAULT_THEME = 'minimalista';
 
 function getStoredTheme() {
     let t = null;
