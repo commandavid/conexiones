@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Darse de baja — Conexiones</title>
+</head>
+<body>
+  <div id="status">Procesando...</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+            apiKey: "AIzaSyDFGP1gUwUyx1zhkPOQeKxoxwgmYRqv2V0",
+            authDomain: "conexiones-game.firebaseapp.com",
+            projectId: "conexiones-game",
+            storageBucket: "conexiones-game.firebasestorage.app",
+            messagingSenderId: "491600988468",
+            appId: "1:491600988468:web:7e78362b94f5ff3e0a7d61",
+            //measurementId: "G-9QV8JZWYNK"
+        };
+        
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const statusEl = document.getElementById('status');
+    const token = new URLSearchParams(window.location.search).get('token');
+
+    if (!token) {
+      statusEl.textContent = 'Enlace inválido.';
+    } else {
+      try {
+        await deleteDoc(doc(db, 'subscribers', token));
+        statusEl.textContent = 'Te has dado de baja correctamente. ¡Gracias por jugar!';
+      } catch (err) {
+        statusEl.textContent = 'No se ha podido procesar la baja. Inténtalo de nuevo más tarde.';
+      }
+    }
+  </script>
+</body>
+</html>
