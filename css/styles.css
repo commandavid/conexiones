@@ -386,7 +386,8 @@ h1 {
 
 .info-bar .stat-group {
     display: flex;
-    gap: 16px;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .info-bar .stat-item {
@@ -1186,6 +1187,28 @@ button {
     padding: 28px 24px 22px;
 }
 
+/* "Cerrar" button, bottom-right; hidden on desktop and shown only on mobile. */
+.rules-close {
+    display: none;
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--container-bg);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rules-close:hover {
+    background: var(--surface-hover);
+}
+
 .rules-carousel-row {
     display: flex;
     align-items: center;
@@ -1386,7 +1409,7 @@ button {
     }
 
     .info-bar .stat-group {
-        gap: 12px;
+        gap: 4px;
         flex-wrap: wrap;
     }
 
@@ -1421,9 +1444,13 @@ button {
     }
 
     .rules-carousel-dialog {
-        height: calc(100dvh - 32px);
+        height: calc(100dvh - 120px);
         max-height: none;
-        padding: 20px 12px 16px;
+        padding: 40px 12px 16px;
+    }
+
+    .rules-close {
+        display: inline-block;
     }
 
     .rules-carousel-row {
@@ -1469,7 +1496,7 @@ button {
     }
 
     .info-bar .stat-group {
-        gap: 8px;
+        gap: 4px;
         font-size: 12px;
     }
 

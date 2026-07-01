@@ -210,11 +210,9 @@ function showPuzzleList() {
     puzzleBtn.textContent = '📅';
     // Hide the current puzzle title while the picker is open
     if (puzzleTitleEl) puzzleTitleEl.style.display = 'none';
-    // Hide controls while selecting puzzles
-    try {
-        const triesSpan = document.getElementById('tries').parentElement;
-        if (triesSpan) triesSpan.style.display = 'none';
-    } catch (e) {}
+    // Hide the stats (Intentos/Reinicios) while selecting puzzles
+    const statGroup = document.querySelector('.info-bar .stat-group');
+    if (statGroup) statGroup.style.display = 'none';
     const controlsEl = document.querySelector('.controls');
     if (controlsEl) controlsEl.style.display = 'none';
     // Ocultar botón de leaderboard también
@@ -229,11 +227,9 @@ function hidePuzzleList() {
     renderGrid();
     // Restore the current puzzle title
     if (puzzleTitleEl) puzzleTitleEl.style.display = '';
-    // Restore controls
-    try {
-        const triesSpan = document.getElementById('tries').parentElement;
-        if (triesSpan) triesSpan.style.display = '';
-    } catch (e) {}
+    // Restore the stats
+    const statGroup = document.querySelector('.info-bar .stat-group');
+    if (statGroup) statGroup.style.display = '';
     const controlsEl = document.querySelector('.controls');
     if (controlsEl) controlsEl.style.display = '';
     // Restaurar botón de leaderboard
@@ -486,6 +482,12 @@ function showRules() {
     const dialog = document.createElement('div');
     dialog.className = 'modal-dialog rules-carousel-dialog';
 
+    // "Cerrar" button in the bottom-right corner — only visible on mobile.
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'rules-close';
+    closeBtn.textContent = 'Cerrar';
+    closeBtn.addEventListener('click', closeRulesModal);
+
     const row = document.createElement('div');
     row.className = 'rules-carousel-row';
 
@@ -553,6 +555,7 @@ function showRules() {
         dots.appendChild(dot);
     });
 
+    dialog.appendChild(closeBtn);
     dialog.appendChild(row);
     dialog.appendChild(dots);
     overlay.appendChild(dialog);
