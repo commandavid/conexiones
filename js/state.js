@@ -44,3 +44,4 @@ const acceptBtn = document.getElementById("acceptBtn");
 const resetBtn = document.getElementById("resetBtn");
 const messageEl = document.getElementById("message");
 const puzzleBtn = document.getElementById("puzzleBtn");
+const puzzleTitleEl = document.getElementById("puzzleTitle");

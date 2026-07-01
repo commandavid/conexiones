@@ -208,6 +208,8 @@ function showPuzzleList() {
     clearMessage();
     renderPuzzleList();
     puzzleBtn.textContent = '📅';
+    // Hide the current puzzle title while the picker is open
+    if (puzzleTitleEl) puzzleTitleEl.style.display = 'none';
     // Hide controls while selecting puzzles
     try {
         const triesSpan = document.getElementById('tries').parentElement;
@@ -225,6 +227,8 @@ function hidePuzzleList() {
     gridEl.classList.remove('puzzle-list');
     puzzleBtn.textContent = '📅';
     renderGrid();
+    // Restore the current puzzle title
+    if (puzzleTitleEl) puzzleTitleEl.style.display = '';
     // Restore controls
     try {
         const triesSpan = document.getElementById('tries').parentElement;
@@ -316,43 +320,278 @@ function closeScoreDialog() {
     if (overlay) overlay.remove();
 }
 
-// --- Rules modal -----------------------------------------------------------
-// Placeholder content for now; the full rules will be filled in later.
+// --- Welcome overlay (shown once, on the very first visit) ------------------
+function showWelcome() {
+    closeWelcome();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'welcomeOverlay';
+
+    const dialog = document.createElement('div');
+    dialog.className = 'modal-dialog welcome-dialog';
+
+    const h2 = document.createElement('h2');
+    h2.textContent = '¡Bienvenido a Conexiones!';
+
+    const p = document.createElement('p');
+    p.textContent = 'Esta es la versión no oficial en español del famoso juego "Connections" del NYT.\n¡Agrupa las 16 palabras en grupos de cuatro para ganar!.';
+
+    const buttons = document.createElement('div');
+    buttons.className = 'dialog-buttons';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'btn-save';
+    playBtn.textContent = 'Jugar';
+    playBtn.addEventListener('click', closeWelcome);
+
+    const howBtn = document.createElement('button');
+    howBtn.className = 'btn-skip';
+    howBtn.textContent = 'Cómo jugar';
+    howBtn.addEventListener('click', () => {
+        closeWelcome();
+        showRules();
+    });
+
+    buttons.appendChild(playBtn);
+    buttons.appendChild(howBtn);
+
+    dialog.appendChild(h2);
+    dialog.appendChild(p);
+    dialog.appendChild(buttons);
+    overlay.appendChild(dialog);
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeWelcome();
+    });
+
+    document.body.appendChild(overlay);
+}
+
+function closeWelcome() {
+    const overlay = document.getElementById('welcomeOverlay');
+    if (overlay) overlay.remove();
+}
+
+// --- How-to-play carousel --------------------------------------------------
+// Temporary placeholder cards. Drop the real media into assets/instructions/
+// using the filename shown in each card's `media.file` (no code change needed):
+//   - type 'image'     -> an <img> (e.g. a .jpg)
+//   - type 'video'     -> an autoplaying, looping, muted <video> (e.g. a .mov)
+//   - type 'highlight' -> a highlighted text box (uses `media.content`)
+// Edit `text` to change the description shown below each title.
+const RULES_CARDS = [
+    {
+        title: '¿Cómo ganar?',
+        text: 'Tienes que conseguir hacer cuatro grupos de cuatro palabras con las 16 de la cuadrícula. Cada grupo tiene una conexión que las relaciona.',
+        media: { type: 'image', file: 'card1.jpg' }
+    },
+    {
+        title: 'Selecciona las palabras',
+        text: 'Toca las cuatro palabras que creas que van juntas y pulsa «Aceptar».',
+        media: { type: 'video', file: 'card2.mov' }
+    },
+    {
+        title: 'Ordénalas como prefieras',
+        text: 'Si te ayuda, puedes reordenar las palabras a tu gusto arrastrándolas (manteniendo pulsado y arrastrando en móvil).',
+        media: { type: 'video', file: 'card3.mov' }
+    },
+    {
+        title: 'Cómo reiniciar',
+        text: 'Si te quedas sin intentos... ¡No te rindas! Pulsa «Reiniciar» para volver a empezar.',
+        media: { type: 'video', file: 'card4.mov' }
+    },
+    {
+        title: 'Botones',
+        text: '¿Para qué sirven el resto de botones?',
+        media: {
+            type: 'highlight',
+            content: '🎨  Cambia el tema de la aplicación\n🌙/☀️  Cambia el modo claro/oscuro\n⭐  Déjanos tu correo y te avisaremos de nuevos puzzles\n🏆  Consulta las mejores puntuaciones del puzzle\n📅  Juega puzzles de otros días'
+        },
+        note: 'Este es un proyecto pasional, no busca lucro ni almacenar datos personales con otro fin que no sea informar de nuevos puzzles. Esperamos que lo disfrutes y nos dejes tu feedback. ¡Gracias por jugar!'
+    }
+];
+
+let _rulesIndex = 0;
+let _rulesKeyHandler = null;
+
+// Builds the media area for a rules card: an image, an autoplaying/looping
+// video, or a highlighted text box. Images and videos fall back to a labelled
+// placeholder until the real file is dropped into assets/instructions/.
+function buildRulesMedia(card) {
+    const media = card.media || {};
+
+    if (media.type === 'highlight') {
+        const box = document.createElement('div');
+        box.className = 'rules-highlight';
+        box.textContent = media.content || '';
+        return box;
+    }
+
+    const box = document.createElement('div');
+    box.className = 'rules-gif';
+
+    const fallback = document.createElement('div');
+    fallback.className = 'rules-gif-fallback';
+    const icon = document.createElement('span');
+    icon.className = 'rules-gif-icon';
+    icon.textContent = media.type === 'video' ? '🎬' : '🖼️';
+    const name = document.createElement('span');
+    name.className = 'rules-gif-name';
+    name.textContent = media.file || '';
+    fallback.appendChild(icon);
+    fallback.appendChild(name);
+    box.appendChild(fallback);
+
+    const src = `assets/instructions/${media.file}`;
+    let el, readyEvent;
+    if (media.type === 'video') {
+        el = document.createElement('video');
+        el.src = src;
+        el.autoplay = true;
+        el.loop = true;
+        el.muted = true;
+        el.playsInline = true;
+        el.setAttribute('playsinline', '');
+        readyEvent = 'loadeddata';
+    } else {
+        el = document.createElement('img');
+        el.src = src;
+        el.alt = card.title;
+        readyEvent = 'load';
+    }
+    el.className = 'rules-gif-img';
+    el.hidden = true;
+    // Reveal the media only once it actually loads, and drop the placeholder,
+    // so the dashed outline hugs the media instead of the whole box. If the
+    // file is missing, the media stays hidden and the placeholder shows.
+    el.addEventListener(readyEvent, () => {
+        el.hidden = false;
+        fallback.style.display = 'none';
+    });
+    el.addEventListener('error', () => { el.hidden = true; });
+    box.appendChild(el);
+
+    return box;
+}
+
 function showRules() {
     closeRulesModal();
+    _rulesIndex = 0;
 
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.id = 'rulesOverlay';
 
     const dialog = document.createElement('div');
-    dialog.className = 'modal-dialog rules-dialog';
+    dialog.className = 'modal-dialog rules-carousel-dialog';
 
-    const h2 = document.createElement('h2');
-    h2.textContent = 'Cómo jugar';
+    const row = document.createElement('div');
+    row.className = 'rules-carousel-row';
 
-    const p = document.createElement('p');
-    p.textContent = 'Encuentra los cuatro grupos de cuatro palabras que comparten algo en común. ' +
-        'Selecciona cuatro tarjetas y pulsa «Aceptar». (Reglas detalladas próximamente.)';
+    const prev = document.createElement('button');
+    prev.className = 'rules-arrow rules-arrow--prev';
+    prev.setAttribute('aria-label', 'Anterior');
+    prev.textContent = '‹';
+    prev.addEventListener('click', () => goToRule(_rulesIndex - 1));
 
-    const close = document.createElement('button');
-    close.className = 'btn-save';
-    close.textContent = 'Entendido';
-    close.addEventListener('click', closeRulesModal);
+    const carousel = document.createElement('div');
+    carousel.className = 'rules-carousel';
 
-    dialog.appendChild(h2);
-    dialog.appendChild(p);
-    dialog.appendChild(close);
+    const track = document.createElement('div');
+    track.className = 'rules-track';
+    track.id = 'rulesTrack';
+
+    RULES_CARDS.forEach(card => {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'rules-card';
+
+        const title = document.createElement('h3');
+        title.className = 'rules-card-title';
+        title.textContent = card.title;
+
+        const text = document.createElement('p');
+        text.className = 'rules-card-text';
+        text.textContent = card.text || '';
+
+        const media = buildRulesMedia(card);
+
+        cardEl.appendChild(title);
+        if (card.text) cardEl.appendChild(text);
+        cardEl.appendChild(media);
+
+        if (card.note) {
+            const note = document.createElement('p');
+            note.className = 'rules-card-text';
+            note.textContent = card.note;
+            cardEl.appendChild(note);
+        }
+
+        track.appendChild(cardEl);
+    });
+
+    carousel.appendChild(track);
+
+    const next = document.createElement('button');
+    next.className = 'rules-arrow rules-arrow--next';
+    next.setAttribute('aria-label', 'Siguiente');
+    next.textContent = '›';
+    next.addEventListener('click', () => goToRule(_rulesIndex + 1));
+
+    row.appendChild(prev);
+    row.appendChild(carousel);
+    row.appendChild(next);
+
+    const dots = document.createElement('div');
+    dots.className = 'rules-dots';
+    dots.id = 'rulesDots';
+    RULES_CARDS.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'rules-dot' + (i === 0 ? ' rules-dot--active' : '');
+        dot.setAttribute('aria-label', `Ir a la tarjeta ${i + 1}`);
+        dot.addEventListener('click', () => goToRule(i));
+        dots.appendChild(dot);
+    });
+
+    dialog.appendChild(row);
+    dialog.appendChild(dots);
     overlay.appendChild(dialog);
 
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeRulesModal();
     });
 
+    _rulesKeyHandler = (e) => {
+        if (e.key === 'ArrowLeft') goToRule(_rulesIndex - 1);
+        else if (e.key === 'ArrowRight') goToRule(_rulesIndex + 1);
+        else if (e.key === 'Escape') closeRulesModal();
+    };
+    document.addEventListener('keydown', _rulesKeyHandler);
+
     document.body.appendChild(overlay);
 }
 
+// Move to card `i`, looping around at both ends.
+function goToRule(i) {
+    const count = RULES_CARDS.length;
+    _rulesIndex = ((i % count) + count) % count;
+
+    const track = document.getElementById('rulesTrack');
+    if (track) track.style.transform = `translateX(-${_rulesIndex * 100}%)`;
+
+    const dots = document.getElementById('rulesDots');
+    if (dots) {
+        Array.from(dots.children).forEach((dot, idx) => {
+            dot.classList.toggle('rules-dot--active', idx === _rulesIndex);
+        });
+    }
+}
+
 function closeRulesModal() {
+    if (_rulesKeyHandler) {
+        document.removeEventListener('keydown', _rulesKeyHandler);
+        _rulesKeyHandler = null;
+    }
     const overlay = document.getElementById('rulesOverlay');
     if (overlay) overlay.remove();
 }

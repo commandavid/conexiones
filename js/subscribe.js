@@ -57,10 +57,10 @@ const dialog = document.createElement('div');
 dialog.className = 'modal-dialog';
 
 const h2 = document.createElement('h2');
-h2.textContent = '¿Te avisamos?';
+h2.textContent = '¿Quieres saber cuándo se publica un nuevo puzzle?';
 
 const p = document.createElement('p');
-p.textContent = 'Déjanos tu correo y te avisaremos cuando se publique un nuevo puzzle.';
+p.textContent = 'Déjanos tu correo y te avisaremos.';
 
 const label = document.createElement('label');
 label.setAttribute('for', 'subscribeEmail');
@@ -82,12 +82,12 @@ buttons.className = 'dialog-buttons';
 
 const saveBtn = document.createElement('button');
 saveBtn.className = 'btn-save';
-saveBtn.textContent = 'Suscribirme';
+saveBtn.textContent = 'Enviar';
 saveBtn.addEventListener('click', submitSubscription);
 
 const skipBtn = document.createElement('button');
 skipBtn.className = 'btn-skip';
-skipBtn.textContent = 'Ahora no';
+skipBtn.textContent = 'Mejor no';
 skipBtn.addEventListener('click', closeSubscribeModal);
 
 input.addEventListener('keypress', (e) => {

@@ -353,8 +353,20 @@ h1 {
 .subtitle {
     text-align: center;
     color: var(--text-muted);
-    margin-bottom: 24px;
+    margin-bottom: 8px;
     font-size: 14px;
+}
+
+.puzzle-title {
+    text-align: center;
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 24px;
+}
+
+.puzzle-title:empty {
+    display: none;
 }
 
 .info-bar {
@@ -506,7 +518,16 @@ h1 {
 
 /* --- Puzzle list view (shows available puzzles in two columns) ----------- */
 .puzzle-list {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    /* Cap the height so the general container stays stable as puzzles pile
+       up; the list scrolls internally instead of stretching the card. */
+    max-height: min(60vh, 520px);
+    overflow-y: auto;
+    /* Inner gutter so the hover lift/shadow isn't clipped and the scrollbar
+       doesn't overlap the difficulty badges. */
+    padding: 6px 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
 }
 
 .puzzle-tile {
@@ -517,6 +538,9 @@ h1 {
     display: flex;
     align-items: center;
     gap: 12px;
+    /* Allow the tile to shrink inside its grid track so a long name can
+       truncate with an ellipsis instead of overflowing to the right. */
+    min-width: 0;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -585,25 +609,25 @@ h1 {
 /* --- Category colors ------------------------------------------------------ */
 .card.morado {
     background: var(--cat-morado);
-    color: white;
+    color: rgb(21, 21, 21);
     border-color: var(--cat-morado);
 }
 
 .card.azul {
     background: var(--cat-azul);
-    color: white;
+    color: rgb(21, 21, 21);
     border-color: var(--cat-azul);
 }
 
 .card.verde {
     background: var(--cat-verde);
-    color: white;
+    color: rgb(21, 21, 21);
     border-color: var(--cat-verde);
 }
 
 .card.amarillo {
     background: var(--cat-amarillo);
-    color: var(--cat-amarillo-text);
+    color: rgb(21, 21, 21);
     border-color: var(--cat-amarillo);
 }
 
@@ -1144,17 +1168,177 @@ button {
     color: var(--msg-success);
 }
 
-.rules-dialog {
-    text-align: left;
+/* --- Welcome overlay (first visit) --- */
+.welcome-dialog p {
+    font-size: 15px;
+    margin: 8px 0 20px;
 }
 
-.rules-dialog h2 {
+/* --- How-to-play carousel --- */
+.rules-carousel-dialog {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 720px;
+    height: calc(100dvh - 80px);
+    max-height: 920px;
+    padding: 28px 24px 22px;
+}
+
+.rules-carousel-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.rules-arrow {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.rules-arrow:hover {
+    background: var(--surface-hover);
+    transform: scale(1.08);
+}
+
+.rules-carousel {
+    flex: 1 1 auto;
+    align-self: stretch;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.rules-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.35s ease;
+}
+
+.rules-card {
+    flex: 0 0 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    min-height: 0;
+    padding: 4px 2px;
+}
+
+.rules-card-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
     text-align: center;
 }
 
-.rules-dialog .btn-save {
+.rules-card-text {
+    margin: 0;
+    max-width: 56ch;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.rules-gif {
+    position: relative;
     width: 100%;
-    margin-top: 16px;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.rules-gif-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+}
+
+.rules-gif-icon {
+    font-size: 34px;
+    opacity: 0.7;
+}
+
+.rules-gif-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.rules-gif-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    background: var(--container-bg);
+}
+
+.rules-highlight {
+    flex: 0 0 auto;
+    max-width: 100%;
+    text-align: left;
+    white-space: pre-line;
+    padding: 18px 22px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+.rules-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.rules-dot {
+    flex: 0 0 auto;
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rules-dot--active {
+    background: var(--accent);
+    transform: scale(1.25);
 }
 
 /* --- Responsive --- */
@@ -1169,6 +1353,11 @@ button {
 
     .subtitle {
         font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .puzzle-title {
+        font-size: 16px;
         margin-bottom: 16px;
     }
 
@@ -1231,8 +1420,37 @@ button {
         flex-direction: column;
     }
 
+    .rules-carousel-dialog {
+        height: calc(100dvh - 32px);
+        max-height: none;
+        padding: 20px 12px 16px;
+    }
+
+    .rules-carousel-row {
+        gap: 4px;
+    }
+
+    .rules-arrow {
+        width: 34px;
+        height: 34px;
+        font-size: 20px;
+    }
+
+    .rules-card-title {
+        font-size: 19px;
+    }
+
+    .rules-card-text {
+        font-size: 14px;
+    }
+
+    .rules-highlight {
+        font-size: 15px;
+        padding: 14px 16px;
+    }
+
     .puzzle-list {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: minmax(0, 1fr) !important;
     }
 }
 

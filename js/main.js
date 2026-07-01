@@ -79,6 +79,14 @@ if (typeof PUZZLES !== 'undefined') {
     resetGame();
 }
 
+// Show the welcome overlay only on the very first visit.
+try {
+    if (!localStorage.getItem('conexiones-welcomed')) {
+        localStorage.setItem('conexiones-welcomed', '1');
+        showWelcome();
+    }
+} catch (e) {}
+
 // --- Leaderboard functions (exposed globally) ---
 
 // Submit score from dialog
@@ -114,6 +122,7 @@ async function showLeaderboard() {
     document.querySelector('.controls').style.display = 'none';
     document.getElementById('puzzleBtn').style.display = 'none';
     if (leaderboardBtn) leaderboardBtn.style.display = 'none';
+    if (puzzleTitleEl) puzzleTitleEl.style.display = 'none';
     
     renderLeaderboard(scores);
 }
@@ -126,6 +135,7 @@ function hideLeaderboard() {
     document.querySelector('.controls').style.display = '';
     document.getElementById('puzzleBtn').style.display = '';
     if (leaderboardBtn) leaderboardBtn.style.display = '';
+    if (puzzleTitleEl) puzzleTitleEl.style.display = '';
 }
 
 // Skip submitting a score but still send the player to the leaderboard

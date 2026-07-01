@@ -28,6 +28,9 @@ function loadPuzzle(index) {
     currentPuzzleIndex = index;
     CATEGORIES = PUZZLES[index].categories;
     CATEGORIES_TITLES = PUZZLES[index].titles;
+    if (puzzleTitleEl) {
+        puzzleTitleEl.textContent = PUZZLES[index].label || PUZZLES[index].date || `Puzzle ${index + 1}`;
+    }
     // reset state
     resetCount = 0;
     totalFails = 0;
