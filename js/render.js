@@ -125,15 +125,18 @@ function renderPuzzleList() {
     if (typeof PUZZLES === 'undefined' || !PUZZLES.length) return;
 
     // Chronological order (oldest first) drives the puzzle numbering: the
-    // earliest puzzle is #1 and the count goes up from there.
-    const chronological = PUZZLES.map((p, i) => i).sort((a, b) => {
-        const da = Date.parse(PUZZLES[a].date || '');
-        const db = Date.parse(PUZZLES[b].date || '');
-        const ta = Number.isNaN(da) ? 0 : da;
-        const tb = Number.isNaN(db) ? 0 : db;
-        if (ta !== tb) return ta - tb;
-        return a - b;
-    });
+    // earliest puzzle is #1 and the count goes up from there. Future-dated
+    // puzzles are filtered out so they stay hidden until their day arrives.
+    const chronological = PUZZLES.map((p, i) => i)
+        .filter(i => isPuzzleAvailable(PUZZLES[i]))
+        .sort((a, b) => {
+            const da = Date.parse(PUZZLES[a].date || '');
+            const db = Date.parse(PUZZLES[b].date || '');
+            const ta = Number.isNaN(da) ? 0 : da;
+            const tb = Number.isNaN(db) ? 0 : db;
+            if (ta !== tb) return ta - tb;
+            return a - b;
+        });
     const numberByIndex = {};
     chronological.forEach((idx, k) => { numberByIndex[idx] = k + 1; });
 
